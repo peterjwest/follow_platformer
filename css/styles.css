@@ -1,0 +1,16 @@
+#content {
+  position: relative;
+}
+
+section {
+  padding-bottom: 40px; margin-bottom: 20px;
+  border-bottom: 1px dashed #999;
+}
+
+.player {
+  position: absolute;
+  top: 0; left: 0;
+  width: 30px;
+  height: 60px;
+  background: #1356a9;
+}

@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <link rel="stylesheet" href="css/bootstrap.css"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+
+  <body>
+    <div class="container" id="content">
+      <section>
+        <h2>Some title</h2>
+        <p>
+          This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+
+          This is a good example of a sentence in English. We all went to the zoo to see the lions. This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters.<br/><br/>
+
+          This is a good example of a sentence in English. We all went to the zoo to see the lions. This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+        </p>
+
+      </section>
+      <section>
+        <h2>Some other title</h2>
+        <p>
+          This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+
+          This is a good example of a sentence in English. We all went to the zoo to see the lions. This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. Blue is a good colour to paint your kitchen.<br/><br/>
+        </p>
+      </section>
+      <section>
+        <h2>Some title</h2>
+        <p>
+          This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+
+          This is a good example of a sentence in English. We all went to the zoo to see the lions. This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+
+          This is a good example of a sentence in English. We all went to the zoo to see the lions. This is a sample paragraph of text where something happened in a good kind of way. Then we went to the park and ate some mushrooms. I really like helicopters. Blue is a good colour to paint your kitchen.<br/><br/>
+        </p>
+      </section>
+      <div class="player"></div>
+    </div>
+  </body>
+
+  <script src="js/jquery.js"></script>
+  <script>
+    $(function() {
+      var body = $("body");
+      var content = $("#content");
+      var page = {width: content.width(), padding: (body.width() - content.width()) / 2}
+
+      var mouse = {x: 0, y: 0};
+      $(body).mousemove(function(e) {
+        mouse.x = Math.min(Math.max(e.pageX - page.padding, 0), page.width);
+        mouse.y = e.pageY;
+      });
+
+      var levels = $("section").map(function() {
+        var self = $(this);
+        return {
+          top: self.offset().top,
+          ground: self.offset().top + self.outerHeight(),
+          obj: self
+        };
+      }).toArray();
+
+      console.log(levels);
+
+      var player = {
+        width: $(".player").width(),
+        height: $(".player").outerHeight(true),
+        level: levels[0],
+        preparing: false,
+        jumping: false,
+        p: {x:0, y: 0},
+        v: {x:0, y: 0},
+        a: {x:0, y: 0},
+        obj: $(".player"),
+        step: function() {
+          this.v.x = this.v.x * 0.95 + this.a.x;
+          this.v.y = this.v.y + this.a.y;
+          this.p.x += this.v.x;
+          this.p.y += this.v.y;
+          this.obj.css({top: parseInt(this.p.y), left: parseInt(this.p.x)});
+        }
+      };
+
+      player.p.y = player.level.ground - player.height;
+
+      setInterval(function() {
+        var goal = null;
+        levels.map(function(level) {
+          if (mouse.y >= level.top) goal = level;
+        });
+
+        // Player movement
+        player.a.x = (mouse.x > (player.p.x + player.width/2) ? 1 : -1) * 1;
+        if (Math.abs(mouse.x - (player.p.x + player.width/2)) < player.width/2 && Math.abs(player.v.x) < player.width/8) {
+          player.a.x = 0;
+        }
+
+        // Player level changing
+        if (player.level !== goal && !player.jumping) {
+          var prev = player.level;
+
+          if (prev.ground > goal.ground) {
+            player.preparing = true;
+            setTimeout(function() {
+              var dist = prev.ground - goal.ground;
+              player.a.y = 4;
+              player.v.y = - 1.1 * Math.sqrt(2 * player.a.y * dist);
+              player.preparing = false;
+            }, 150);
+          }
+          else {
+            setTimeout(function() {
+              player.a.y = 4;
+            }, 50);
+          }
+
+          player.level = goal;
+          player.jumping = true;
+        }
+
+        if (player.preparing) {
+          player.a.x = 0;
+        }
+
+        var falling = player.v.y > 0 && player.a.y > 0;
+        var aboveFloor = player.p.y < player.level.ground - player.height;
+        var willBeBelowFloor = player.p.y + player.v.y + player.a.y >= player.level.ground - player.height;
+
+        if (falling && aboveFloor && willBeBelowFloor) {
+          player.a.y = 0;
+          player.v.y = 0;
+          player.p.y = player.level.ground - player.height;
+          player.jumping = false;
+        }
+
+        player.step();
+
+      }, 20);
+    });
+  </script>
+</html>
