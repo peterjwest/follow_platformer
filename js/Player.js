@@ -57,8 +57,9 @@ Player.prototype.update = function() {
         var v = this.requiredVelocity(this.target, f);
         // Test if we are ready to jump
         if (
-            !this.over(this.platform) ||
-            v > 0 ? this.v.x() >= v : this.v.x() <= v
+            v === 0 ||
+            (v > 0 ? this.v.x() >= v : this.v.x() <= v) ||
+            !this.over(this.platform)
         ) {
             // Initiate the jump using the correct velocity (hacks!)
             this.v.x(v);
