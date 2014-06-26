@@ -115,6 +115,7 @@ Player.prototype.update = function() {
     return this;
 };
 
+// Works out which platforms the player can jump to from which other platforms
 Player.prototype.findPaths = function(platforms) {
     this.pushState();
 
@@ -134,12 +135,14 @@ Player.prototype.findPaths = function(platforms) {
     this.popState();
 };
 
+// Teleports the player to a platform
 Player.prototype.moveTo = function(platform) {
     this.platform = platform;
     this.p.y(this.platform.p.y());
     this.p.x(this.platform.p.x());
 };
 
+// Saves the state of the player
 Player.prototype.pushState = function() {
     this.states.push({
         p: this.p.copy(),
@@ -157,6 +160,7 @@ Player.prototype.pushState = function() {
     });
 };
 
+// Restores the state of the player
 Player.prototype.popState = function() {
     var state = this.states.pop();
     this.size = state.size;
@@ -173,12 +177,14 @@ Player.prototype.popState = function() {
     this.route = state.route;
 };
 
+// The direction towards a platform
 Player.prototype.direction = function(platform) {
     if (this.left() < platform.left()) return 1;
     if (this.right() > platform.right()) return -1;
     return 0;
 };
 
+// Computest the height of a jump
 Player.prototype.jumpHeight = function() {
     this.pushState();
 
@@ -198,6 +204,7 @@ Player.prototype.jumpHeight = function() {
     return Math.abs(height);
 };
 
+// Computes the number of frames in a jump to another platform
 Player.prototype.jumpFrames = function(target) {
     this.pushState();
 
@@ -220,6 +227,7 @@ Player.prototype.jumpFrames = function(target) {
     return frames;
 };
 
+// Computes the velocity needed to jump to another platform
 Player.prototype.requiredVelocity = function(target, jumpFrames) {
     var direction = this.direction(target);
     var padding = 10;
@@ -233,10 +241,12 @@ Player.prototype.requiredVelocity = function(target, jumpFrames) {
     }
 };
 
+// Checks if the player is fully over a platform
 Player.prototype.over = function(platform) {
     return this.left() >= platform.left() && this.right() <= platform.right();
 };
 
+// Checks if the player could potentially jump to another platform
 Player.prototype.couldJump = function(target) {
     this.pushState();
 
@@ -248,6 +258,7 @@ Player.prototype.couldJump = function(target) {
     return canJump;
 };
 
+// Computes the number of steps needed for a back off jump
 Player.prototype.computeBackOffJump = function(target) {
     var i, steps = 0;
 
@@ -281,6 +292,7 @@ Player.prototype.computeBackOffJump = function(target) {
     return steps;
 };
 
+// Checks if the player can jump from their current position to another platform
 Player.prototype.canJump = function(target) {
     if (this.jumpHeight() < this.platform.p.y() - target.p.y()) return false;
 
@@ -306,6 +318,7 @@ Player.prototype.canJump = function(target) {
     return false;
 };
 
+// Performs a jump to a platform, if possible
 Player.prototype.jump = function(target) {
     if (this.platform === target) return;
     if (!this.couldJump(target)) return;
@@ -314,10 +327,12 @@ Player.prototype.jump = function(target) {
     this.backOff = this.computeBackOffJump(target);
 };
 
+// Finds a route to a platform and navigates to it
 Player.prototype.jumpTo = function(target, platforms) {
     this.route = this.findRoute(target, platforms);
 };
 
+// Djikstra search for a shortest path
 Player.prototype.findRoute = function(target, platforms) {
     var frontier = [{position: this.platform.id, route: [this.platform]}];
     var next = [];
