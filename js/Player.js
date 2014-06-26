@@ -1,6 +1,5 @@
-var Player = function($elem, keys) {
+var Player = function($elem) {
     this.$elem = $elem;
-    this.keys = keys;
 
     this.size = Vector.size(this.$elem);
     this.p = Vector.offset(this.$elem);
@@ -23,16 +22,6 @@ var Player = function($elem, keys) {
 };
 
 Player.prototype.update = function() {
-    // // Running
-    // if (this.grounded) {
-    //     if (this.keys.right) this.running = 1;
-    //     if (this.keys.left) this.running = -1;
-    // }
-
-    // // Jumping
-    // if (this.keys.space && this.grounded) {
-    //     this.jumping = 1;
-    // }
 
     // Backing off for a run up
     if (this.backOff !== false) {

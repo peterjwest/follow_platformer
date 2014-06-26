@@ -16,19 +16,9 @@ $body.mousemove(function(e) {
 
 $body.data('platform', 'bottom');
 $body.css('min-height', window.innerHeight);
+
 var arena = new Platform($body);
-
-var keys = {up: false, down: false, left: false, right: false, space: false};
-var keyCodes = {32: 'space', 37: 'left', 38: 'up', 39: 'right', 40: 'down'};
-
-$document.keydown(function(e){
-  if (keyCodes[e.keyCode]) keys[keyCodes[e.keyCode]] = true;
-});
-$document.keyup(function(e) {
-  if (keyCodes[e.keyCode]) keys[keyCodes[e.keyCode]] = false;
-});
-
-var player = new Player($player, keys);
+var player = new Player($player);
 
 var i = 0;
 var platforms = $platforms.map(function() {
