@@ -42,27 +42,48 @@ Player.prototype.update = function() {
         this.backOff = false;
         this.running = this.direction(this.target);
 
+        // Settings for a shorter jump, when jumping down or nearby
         var shortJump = 0.3;
+
+        // Test whether the shorter jump is high enough to succeed
+        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.p.y() - this.target.p.y();
+
+        // Work out the required velocity for a shorter jump
         var v = this.requiredVelocity(this.target, this.jumpFrames(this.target, shortJump));
 
         // Test if we are ready to jump
-        if (
-            (this.jumpHeight(shortJump) >= this.platform.p.y() - this.target.p.y()) &&
-            (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))
-        ) {
-            // Initiate the jump using the correct velocity (hacks!)
-            this.v.x(v);
-            this.a.x(0);
-            this.jumping = shortJump;
-        }
-        else {
-            v = this.requiredVelocity(this.target, this.jumpFrames(this.target));
-            // Test if we are ready to jump
-            if (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v) || !this.over(this.platform)) {
+        if (shortJumpHeight && (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))) {
+
+            // Check if the velocity is too high
+            if (Math.abs(this.v.x() - v) > 0.5) {
+                // Decelerate
+                this.running = this.v.x() > 0 ? -1 : 1;
+            }
+            else {
                 // Initiate the jump using the correct velocity (hacks!)
                 this.v.x(v);
                 this.a.x(0);
-                this.jumping = 1;
+                this.jumping = shortJump;
+            }
+        }
+        else {
+            // Work out the required velocity for a full jump
+            v = this.requiredVelocity(this.target, this.jumpFrames(this.target));
+
+            // Test if we are ready to jump
+            if (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v) || !this.over(this.platform)) {
+
+                // Check if the velocity is too high
+                if (Math.abs(this.v.x() - v) > 1) {
+                    // Decelerate
+                    this.running = this.v.x() > 0 ? -1 : 1;
+                }
+                else {
+                    // Initiate the jump using the correct velocity (hacks!)
+                    this.v.x(v);
+                    this.a.x(0);
+                    this.jumping = 1;
+                }
             }
         }
     }
