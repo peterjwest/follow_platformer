@@ -42,18 +42,28 @@ Player.prototype.update = function() {
         this.backOff = false;
         this.running = this.direction(this.target);
 
-        var f = this.jumpFrames(this.target);
-        var v = this.requiredVelocity(this.target, f);
+        var shortJump = 0.3;
+        var v = this.requiredVelocity(this.target, this.jumpFrames(this.target, shortJump));
+
         // Test if we are ready to jump
         if (
-            v === 0 ||
-            (v > 0 ? this.v.x() >= v : this.v.x() <= v) ||
-            !this.over(this.platform)
+            (this.jumpHeight(shortJump) >= this.platform.p.y() - this.target.p.y()) &&
+            (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))
         ) {
             // Initiate the jump using the correct velocity (hacks!)
             this.v.x(v);
             this.a.x(0);
-            this.jumping = 1;
+            this.jumping = shortJump;
+        }
+        else {
+            v = this.requiredVelocity(this.target, this.jumpFrames(this.target));
+            // Test if we are ready to jump
+            if (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v) || !this.over(this.platform)) {
+                // Initiate the jump using the correct velocity (hacks!)
+                this.v.x(v);
+                this.a.x(0);
+                this.jumping = 1;
+            }
         }
     }
 
@@ -61,7 +71,6 @@ Player.prototype.update = function() {
     if (this.jumping) {
         this.runUp = false;
         this.running = 0;
-
         this.v.y(this.jumpSpeed * this.jumping);
         this.jumping = 0;
     }
@@ -185,13 +194,13 @@ Player.prototype.direction = function(platform) {
 };
 
 // Computest the height of a jump
-Player.prototype.jumpHeight = function() {
+Player.prototype.jumpHeight = function(scale) {
     this.pushState();
 
     this.route = [];
     this.runUp = false;
     this.backOff = false;
-    this.jumping = 1;
+    this.jumping = scale || 1;
     this.p.y(0);
 
     this.update();
@@ -205,7 +214,7 @@ Player.prototype.jumpHeight = function() {
 };
 
 // Computes the number of frames in a jump to another platform
-Player.prototype.jumpFrames = function(target) {
+Player.prototype.jumpFrames = function(target, scale) {
     this.pushState();
 
     this.p.y(this.platform.p.y());
@@ -214,7 +223,7 @@ Player.prototype.jumpFrames = function(target) {
     this.route = [];
     this.runUp = false;
     this.backOff = false;
-    this.jumping = 1;
+    this.jumping = scale || 1;
 
     var frames = 1;
     this.update();
