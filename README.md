@@ -8,5 +8,7 @@ This is a small demo to show how a platformer character could be controlled by a
 
 - determine min jump distance
 - nearest platform hover
-- platform navigation
+- intra platform navigation
+- update algorithm to take platform distance into account
+- add maximum fall distance
 - add 'thinking time'
