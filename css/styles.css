@@ -1,8 +1,12 @@
-section {
+.platform {
   position: absolute;
   background: #98C298;
   border-bottom: 1px solid #80A780;
   border-left: 1px solid #80A780;
+}
+
+.platform-inset {
+    background: #579157;
 }
 
 .player {
@@ -12,3 +16,4 @@ section {
   height: 50px;
   background: #1356a9;
 }
+
