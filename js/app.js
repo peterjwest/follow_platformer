@@ -9,11 +9,6 @@ var method = function(name) {
     return function(item) { return item[name].apply(item, args); };
 };
 
-var mouse = new Vector();
-$body.mousemove(function(e) {
-  mouse.mouse(e);
-});
-
 $body.data('platform', 'bottom');
 $body.css('min-height', window.innerHeight);
 
@@ -25,9 +20,9 @@ var platforms = $platforms.map(function() {
   var platform = new Platform($(this));
   platform.id = i++;
 
-  $(this).hover(function() {
-    player.jumpTo(platform, platforms);
-  });
+  // $(this).hover(function() {
+  //   player.jumpTo(platform, platforms);
+  // });
 
   return platform;
 }).toArray();
@@ -39,8 +34,26 @@ $window.resize(function() {
 });
 
 player.findPaths(platforms);
-
 player.platform = platforms[0];
+
+var nearestPlatform = function(vector, platforms) {
+  var nearest = platforms[0];
+  var distance = nearest.distanceFrom(vector);
+  platforms.slice(1).map(function(platform) {
+    var newDistance = platform.distanceFrom(vector);
+    if (newDistance < distance) {
+      distance = newDistance;
+      nearest = platform;
+    }
+  });
+  return nearest;
+};
+
+var mouse = new Vector();
+$body.mousemove(function(e) {
+  mouse.mouse(e);
+  player.jumpTo(nearestPlatform(mouse, platforms), platforms);
+});
 
 var loop = function() {
   player.update();

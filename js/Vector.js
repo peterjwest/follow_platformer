@@ -33,6 +33,10 @@ Vector.prototype.y = function(y) {
   return this;
 };
 
+Vector.prototype.multiply = function(scale) {
+  return new Vector(this.elems.map(function(e) { return e * scale; }));
+};
+
 Vector.prototype.round = function() {
   return new Vector(this.elems.map(Math.round));
 };
