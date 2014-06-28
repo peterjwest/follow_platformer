@@ -7,6 +7,6 @@ This is a small demo to show how a platformer character could be controlled by a
 ## TODO
 
 - determine min jump distance
-- add short jump
-- nearest match
+- nearest platform hover
 - platform navigation
+- add 'thinking time'
