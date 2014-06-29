@@ -16,6 +16,7 @@ var Player = function($elem) {
     this.grounded = true;
 
     this.platform = this;
+    this.nextPlatform = null;
     this.target = null;
     this.states = [];
     this.route = [];
@@ -25,7 +26,7 @@ Player.prototype.update = function() {
 
     // Backing off for a run up
     if (this.backOff !== false) {
-        this.running = -this.direction(this.target);
+        this.running = -this.direction(this.nextPlatform);
 
         // If finished backing off, start run up towards target
         if (this.backOff === 0) {
@@ -40,16 +41,16 @@ Player.prototype.update = function() {
     // Running up for a jump
     if (this.runUp) {
         this.backOff = false;
-        this.running = this.direction(this.target);
+        this.running = this.direction(this.nextPlatform);
 
         // Settings for a shorter jump, when jumping down or nearby
         var shortJump = 0.3;
 
         // Test whether the shorter jump is high enough to succeed
-        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.ground() - this.target.ground();
+        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.ground() - this.nextPlatform.ground();
 
         // Work out the required velocity for a shorter jump
-        var v = this.requiredVelocity(this.target, this.jumpFrames(this.target, shortJump));
+        var v = this.requiredVelocity(this.nextPlatform, this.jumpFrames(this.nextPlatform, shortJump));
 
         // Test if we are ready to jump
         if (shortJumpHeight && (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))) {
@@ -68,7 +69,7 @@ Player.prototype.update = function() {
         }
         else {
             // Work out the required velocity for a full jump
-            v = this.requiredVelocity(this.target, this.jumpFrames(this.target));
+            v = this.requiredVelocity(this.nextPlatform, this.jumpFrames(this.nextPlatform));
 
             // Test if we are ready to jump
             if (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v) || !this.over(this.platform)) {
@@ -97,14 +98,15 @@ Player.prototype.update = function() {
     }
 
     // When there is a target
-    if (this.target) {
+    if (this.nextPlatform) {
         // Run
         this.a.x(this.grounded && this.runAccel * this.running);
 
         // Switch to target at peak of jump
         if (!this.grounded && this.v.y() > 0) {
-            this.platform = this.target;
-            this.target = null;
+            this.platform = this.nextPlatform;
+            this.nextPlatform = null;
+            if (this.platform === this.target) this.target = null;
         }
     }
 
@@ -124,12 +126,12 @@ Player.prototype.update = function() {
         this.v.y(0);
 
         // Move the next target from the queue
-        if (!this.target && this.route.length) {
+        if (!this.nextPlatform && this.route.length) {
             this.jump(this.route.shift());
         }
 
         // If there's no target, stop
-        if (!this.target) {
+        if (!this.nextPlatform) {
             // Decelerate
             if (Math.abs(this.v.x()) > 1) {
                 this.a.x(this.runAccel * (this.v.x() > 0 ? -1 : 1));
@@ -180,7 +182,7 @@ Player.prototype.pushState = function() {
         a: this.a.copy(),
         size: this.size.copy(),
         platform: this.platform,
-        target: this.target,
+        target: this.nextPlatform,
         running: this.running,
         jumping: this.jumping,
         runUp: this.runUp,
@@ -198,7 +200,7 @@ Player.prototype.popState = function() {
     this.v = state.v;
     this.a = state.a;
     this.platform = state.platform;
-    this.target = state.target;
+    this.nextPlatform = state.target;
     this.running = state.running;
     this.jumping = state.jumping;
     this.runUp = state.runUp;
@@ -240,7 +242,7 @@ Player.prototype.jumpFrames = function(target, scale) {
 
     this.p.y(this.platform.ground());
 
-    this.target = target;
+    this.nextPlatform = target;
     this.route = [];
     this.runUp = false;
     this.backOff = false;
@@ -294,7 +296,7 @@ Player.prototype.computeBackOffJump = function(target) {
 
     while (true) {
         this.pushState();
-        this.target = target;
+        this.nextPlatform = target;
         this.route = [];
         this.runUp = false;
         this.backOff = false;
@@ -330,7 +332,7 @@ Player.prototype.canJump = function(target) {
 
     var jumpFrames = this.jumpFrames(target);
 
-    this.target = target;
+    this.nextPlatform = target;
     this.route = [];
     this.runUp = false;
     this.backOff = false;
@@ -353,12 +355,14 @@ Player.prototype.jump = function(target) {
     if (this.platform === target) return;
     if (!this.couldJump(target)) return;
 
-    this.target = target;
+    this.nextPlatform = target;
     this.backOff = this.computeBackOffJump(target);
 };
 
 // Finds a route to a platform and navigates to it
 Player.prototype.jumpTo = function(target, platforms) {
+    if (target === this.target) return;
+    this.target = target;
     this.route = this.findRoute(target, platforms);
 };
 
