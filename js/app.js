@@ -52,7 +52,7 @@ var nearestPlatform = function(vector, platforms) {
 var mouse = new Vector();
 $body.mousemove(function(e) {
   mouse.mouse(e);
-  player.jumpTo(nearestPlatform(mouse, platforms), platforms);
+  player.jumpTo(nearestPlatform(mouse.add(new Vector(0, player.size.y() / 2)), platforms), platforms);
 });
 
 var loop = function() {
