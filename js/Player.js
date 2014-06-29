@@ -46,7 +46,7 @@ Player.prototype.update = function() {
         var shortJump = 0.3;
 
         // Test whether the shorter jump is high enough to succeed
-        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.p.y() - this.target.p.y();
+        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.ground() - this.target.ground();
 
         // Work out the required velocity for a shorter jump
         var v = this.requiredVelocity(this.target, this.jumpFrames(this.target, shortJump));
@@ -113,14 +113,14 @@ Player.prototype.update = function() {
     this.p = this.p.add(this.v);
 
     // Recompute whether the player is on the ground
-    this.grounded = this.p.y() >= this.platform.p.y();
+    this.grounded = this.p.y() >= this.platform.ground();
 
     // When grounded
     if (this.grounded) {
 
         // Apply friction and normal resistance
         this.v.x(this.v.x() * this.platform.mu);
-        this.p.y(this.platform.p.y());
+        this.p.y(this.platform.ground());
         this.v.y(0);
 
         // Move the next target from the queue
@@ -168,7 +168,7 @@ Player.prototype.findPaths = function(platforms) {
 // Teleports the player to a platform
 Player.prototype.moveTo = function(platform) {
     this.platform = platform;
-    this.p.y(this.platform.p.y());
+    this.p.y(this.platform.ground());
     this.p.x(this.platform.p.x());
 };
 
@@ -238,7 +238,7 @@ Player.prototype.jumpHeight = function(scale) {
 Player.prototype.jumpFrames = function(target, scale) {
     this.pushState();
 
-    this.p.y(this.platform.p.y());
+    this.p.y(this.platform.ground());
 
     this.target = target;
     this.route = [];
@@ -248,7 +248,7 @@ Player.prototype.jumpFrames = function(target, scale) {
 
     var frames = 1;
     this.update();
-    while (this.v.y() < 0 || this.p.y() < this.platform.p.y()) {
+    while (this.v.y() < 0 || this.p.y() < this.platform.ground()) {
         this.update();
         frames++;
     }
@@ -324,7 +324,7 @@ Player.prototype.computeBackOffJump = function(target) {
 
 // Checks if the player can jump from their current position to another platform
 Player.prototype.canJump = function(target) {
-    if (this.jumpHeight() < this.platform.p.y() - target.p.y()) return false;
+    if (this.jumpHeight() < this.platform.ground() - target.ground()) return false;
 
     this.pushState();
 

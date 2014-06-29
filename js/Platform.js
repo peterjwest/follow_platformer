@@ -27,16 +27,12 @@ Platform.prototype.lateralDistanceFrom = function(vector) {
 };
 
 Platform.prototype.distanceFrom = function(vector) {
-    return Math.abs(this.ground() - vector.y()) + this.lateralDistanceFrom(vector);
+    return Math.sqrt(Math.pow(this.ground() - vector.y(), 2) + Math.pow(this.lateralDistanceFrom(vector), 2));
 };
 
 Platform.prototype.update = function() {
     this.size = Vector.size(this.$elem);
     this.p = Vector.offset(this.$elem).round();
-
-    if (this.type === 'bottom') {
-        this.p.y(this.p.y() + this.size.y());
-    }
 
     return this;
 };
