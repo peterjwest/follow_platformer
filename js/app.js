@@ -1,5 +1,4 @@
 var $window = $(window);
-var $document = $(document);
 var $body = $('body');
 var $player = $('[data-player]');
 var $platforms = $('[data-platform]');
@@ -49,11 +48,40 @@ var nearestPlatform = function(vector, platforms) {
   return nearest;
 };
 
+var now = Date.now || function() { return new Date().getTime(); };
+
+var debounce = function(func, wait) {
+  var timeout, args, context, timestamp, result;
+
+  var later = function() {
+    var last = now() - timestamp;
+    if (last < wait) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      result = func.apply(context, args);
+      context = args = null;
+    }
+  };
+
+  return function() {
+    context = this;
+    args = arguments;
+    timestamp = now();
+    if (!timeout) {
+      timeout = setTimeout(later, wait);
+    }
+
+    return result;
+  };
+};
+
+
 var mouse = new Vector();
-$body.mousemove(function(e) {
+$body.mousemove(debounce(function(e) {
   mouse.mouse(e);
   player.jumpTo(nearestPlatform(mouse.add(new Vector(0, player.size.y() / 2)), platforms), platforms);
-});
+}, 20));
 
 var loop = function() {
   player.update();
