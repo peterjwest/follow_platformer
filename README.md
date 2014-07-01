@@ -6,7 +6,6 @@ This is a small demo to show how a platformer character could be controlled by a
 
 ## TODO
 
-- determine min jump distance
 - intra platform navigation
 - update algorithm to take platform distance into account
 - add maximum fall distance

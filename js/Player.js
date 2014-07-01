@@ -22,6 +22,8 @@ var Player = function($elem) {
     this.route = [];
 };
 
+var PADDING = 5;
+
 Player.prototype.update = function() {
 
     // Backing off for a run up
@@ -55,13 +57,12 @@ Player.prototype.update = function() {
         // Test if we are ready to jump
         if (shortJumpHeight && (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))) {
 
-            // Check if the velocity is too high
-            if (Math.abs(this.v.x() - v) > 0.5) {
-                // Decelerate
+            // Decelerate if the velocity is too inaccurate
+            if (Math.abs(this.v.x() - v) > 1) {
                 this.running = this.v.x() > 0 ? -1 : 1;
             }
+            // Otherwise initiate the jump using the correct velocity (hacks!)
             else {
-                // Initiate the jump using the correct velocity (hacks!)
                 this.v.x(v);
                 this.a.x(0);
                 this.jumping = shortJump;
@@ -71,16 +72,29 @@ Player.prototype.update = function() {
             // Work out the required velocity for a full jump
             v = this.requiredVelocity(this.nextPlatform, this.jumpFrames(this.nextPlatform));
 
-            // Test if we are ready to jump
-            if (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v) || !this.over(this.platform)) {
+            // Check if the player is travelling too fast to land the jump
+            var slowingDistance = this.slowingDistance(this.requiredSpeed(this.nextPlatform));
+            var distanceRemaining = this.v.x() > 0 ? this.platform.right() - this.right() : this.left() - this.platform.left();
+            if (distanceRemaining <= slowingDistance) {
+                this.running = this.v.x() > 0 ? -1 : 1;
+            }
 
-                // Check if the velocity is too high
+            // If we've hit the edge of the platform, jump!
+            if (!this.over(this.platform)) {
+                this.v.x(v);
+                this.a.x(0);
+                this.jumping = 1;
+            }
+
+            // Otherwise test if we are ready to jump
+            else if ((v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v)) && this.stoppingDistance() <= this.nextPlatform.size.x() - PADDING * 2 - this.size.x()) {
+
+                // Decelerate if the velocity is too inaccurate
                 if (Math.abs(this.v.x() - v) > 1) {
-                    // Decelerate
                     this.running = this.v.x() > 0 ? -1 : 1;
                 }
+                // Otherwise initiate the jump using the correct velocity (hacks!)
                 else {
-                    // Initiate the jump using the correct velocity (hacks!)
                     this.v.x(v);
                     this.a.x(0);
                     this.jumping = 1;
@@ -209,14 +223,14 @@ Player.prototype.popState = function() {
     this.route = state.route;
 };
 
-// The direction towards a platform
+// The direction needed to travel towards a platform
 Player.prototype.direction = function(platform) {
     if (this.left() < platform.left()) return 1;
     if (this.right() > platform.right()) return -1;
     return 0;
 };
 
-// Computest the height of a jump
+// Computes the height the player can jump
 Player.prototype.jumpHeight = function(scale) {
     this.pushState();
 
@@ -262,15 +276,49 @@ Player.prototype.jumpFrames = function(target, scale) {
 // Computes the velocity needed to jump to another platform
 Player.prototype.requiredVelocity = function(target, jumpFrames) {
     var direction = this.direction(target);
-    var padding = 10;
 
     if (direction === 0) return 0;
     if (direction === 1) {
-        return (target.left() - this.left() + padding) / jumpFrames;
+        return (target.left() - this.left() + PADDING) / jumpFrames;
     }
     if (direction === -1) {
-        return -(this.right() - target.right() + padding) / jumpFrames;
+        return -(this.right() - target.right() + PADDING) / jumpFrames;
     }
+};
+
+// Computes the distance for the player to slow to the specified speed
+Player.prototype.slowingDistance = function(speed) {
+    this.pushState();
+    var direction = this.v.x() > 0 ? 1 : -1;
+
+    this.running = -direction;
+    this.route = [];
+    this.nextPlatform = null;
+    this.runUp = false;
+    this.backOff = false;
+
+    var start = this.p.x();
+    while (this.v.x() * direction > speed) this.update();
+    var end = this.p.x();
+
+    this.popState();
+    return Math.abs(end - start);
+};
+
+// Computes the stopping distance for the player at their current velocity
+Player.prototype.stoppingDistance = function() {
+    return this.slowingDistance(0);
+};
+
+// Finds the (minimum) required speed to jump to another platform
+Player.prototype.requiredSpeed = function(target) {
+    this.pushState();
+
+    this.p.x(this.direction(target) > 0 ? this.platform.right() - this.size.x() : this.platform.left());
+    var requiredSpeed = Math.abs(this.requiredVelocity(target, this.jumpFrames(target)));
+
+    this.popState();
+    return requiredSpeed;
 };
 
 // Checks if the player is fully over a platform
@@ -280,14 +328,8 @@ Player.prototype.over = function(platform) {
 
 // Checks if the player could potentially jump to another platform
 Player.prototype.couldJump = function(target) {
-    this.pushState();
-
-    this.p.x(this.direction(target) > 0 ? this.platform.left() : this.platform.right() - this.size.x());
-    this.v.x(0);
-    var canJump = this.canJump(target);
-
-    this.popState();
-    return canJump;
+    if (!this.checkJumpHeight(target)) return false;
+    return this.maxSpeed() >= this.requiredSpeed(target);
 };
 
 // Computes the number of steps needed for a back off jump
@@ -324,9 +366,33 @@ Player.prototype.computeBackOffJump = function(target) {
     return steps;
 };
 
+Player.prototype.checkJumpHeight = function(target) {
+ return this.jumpHeight() >= this.platform.ground() - target.ground();
+};
+
+// Finds the max speed the player can travel on a platform
+Player.prototype.maxSpeed = function() {
+    this.pushState();
+
+    this.p.x(this.platform.p.x());
+    this.v.x(0);
+    this.nextPlatform = true;
+    this.route = [];
+    this.runUp = false;
+    this.backOff = false;
+    this.running = 1;
+
+    while (this.over(this.platform)) this.update();
+
+    var speed = Math.abs(this.v.x());
+
+    this.popState();
+    return speed;
+};
+
 // Checks if the player can jump from their current position to another platform
 Player.prototype.canJump = function(target) {
-    if (this.jumpHeight() < this.platform.ground() - target.ground()) return false;
+    if (!this.checkJumpHeight(target)) return false;
 
     this.pushState();
 
@@ -340,8 +406,10 @@ Player.prototype.canJump = function(target) {
 
     while (this.over(this.platform)) {
         if (Math.abs(this.v.x()) >= Math.abs(this.requiredVelocity(target, jumpFrames))) {
-            this.popState();
-            return true;
+            //if (this.stoppingDistance() < target.size.x() - PADDING * 2 - this.size.x()) {
+                this.popState();
+                return true;
+            //}
         }
         this.update();
     }
