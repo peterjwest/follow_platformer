@@ -6,7 +6,7 @@ This is a small demo to show how a platformer character could be controlled by a
 
 ## TODO
 
-- intra platform navigation
+- handle falling short of platform nicely
 - update algorithm to take platform distance into account
 - add maximum fall distance
 - add 'thinking time'

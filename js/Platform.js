@@ -3,7 +3,7 @@ var Platform = function($elem, arena) {
     this.arena = arena;
     this.p = new Vector();
     this.size = new Vector();
-    this.mu = 0.95;
+    this.mu = 0.96;
     this.type = this.$elem.data('platform');
     this.update();
 };
@@ -18,6 +18,16 @@ Platform.prototype.right = function() {
 
 Platform.prototype.ground = function() {
     return this.p.y() + (this.type === 'bottom' ? this.size.y() : 0);
+};
+
+Platform.prototype.lateralRatio = function(vector) {
+    if (vector.x() < this.left()) return 0;
+    if (vector.x() > this.right()) return 1;
+    return (vector.x() - this.p.x()) / this.size.x();
+};
+
+Platform.prototype.positionFromRatio = function(ratio) {
+    return ratio * this.size.x() + this.p.x();
 };
 
 Platform.prototype.lateralDistanceFrom = function(vector) {

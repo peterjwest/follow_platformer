@@ -19,10 +19,6 @@ var platforms = $platforms.map(function() {
   var platform = new Platform($(this));
   platform.id = i++;
 
-  // $(this).hover(function() {
-  //   player.jumpTo(platform, platforms);
-  // });
-
   return platform;
 }).toArray();
 
@@ -34,6 +30,7 @@ $window.resize(function() {
 
 player.findPaths(platforms);
 player.platform = platforms[0];
+player.target = platforms[0];
 
 var nearestPlatform = function(vector, platforms) {
   var nearest = platforms[0];
@@ -77,11 +74,13 @@ var debounce = function(func, wait) {
 };
 
 
-var mouse = new Vector();
+var cursor = new Vector();
 $body.mousemove(debounce(function(e) {
-  mouse.mouse(e);
-  player.jumpTo(nearestPlatform(mouse.add(new Vector(0, player.size.y() / 2)), platforms), platforms);
-}, 30));
+  cursor.mouse(e);
+  var platform = nearestPlatform(cursor.add(new Vector(0, player.size.y() / 2)), platforms);
+  player.jumpTo(platform, platforms);
+  player.runTo(platform.lateralRatio(cursor));
+}, 10));
 
 var loop = function() {
   player.update();

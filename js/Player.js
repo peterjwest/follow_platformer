@@ -4,18 +4,19 @@ var Player = function($elem) {
     this.size = Vector.size(this.$elem);
     this.p = Vector.offset(this.$elem);
     this.v = new Vector();
-    this.a = new Vector(0, 1.2);
+    this.a = new Vector(0, 1);
 
-    this.runAccel = 1;
-    this.jumpSpeed = -18;
+    this.runAccel = 0.7;
+    this.jumpSpeed = -17;
 
+    this.platformPosition = 0.5;
     this.running = 0;
     this.jumping = 0;
     this.runUp = false;
     this.backOff = false;
     this.grounded = true;
 
-    this.platform = this;
+    this.platform = null;
     this.nextPlatform = null;
     this.target = null;
     this.states = [];
@@ -31,7 +32,7 @@ Player.prototype.update = function() {
         this.running = -this.direction(this.nextPlatform);
 
         // If finished backing off, start run up towards target
-        if (this.backOff === 0) {
+        if (this.backOff <= 0) {
             this.runUp = true;
         }
         // When backing off, countdown the back off each frame
@@ -120,7 +121,6 @@ Player.prototype.update = function() {
         if (!this.grounded && this.v.y() > 0) {
             this.platform = this.nextPlatform;
             this.nextPlatform = null;
-            if (this.platform === this.target) this.target = null;
         }
     }
 
@@ -144,12 +144,30 @@ Player.prototype.update = function() {
             this.jump(this.route.shift());
         }
 
-        // If there's no target, stop
+        // If there's no target, move to platform position
         if (!this.nextPlatform) {
-            // Decelerate
-            if (Math.abs(this.v.x()) > 1) {
-                this.a.x(this.runAccel * (this.v.x() > 0 ? -1 : 1));
+
+            var position = this.platform.positionFromRatio(this.platformPosition) - this.size.x() / 2;
+
+            position = Math.max(this.platform.left() + PADDING, position);
+            position = Math.min(this.platform.right() - PADDING - this.size.x(), position);
+
+            if (this.v.x() > 0 && this.stoppingDistance() >= this.platform.right() - this.right()) {
+                this.a.x(-this.runAccel);
             }
+
+            else if (this.v.x() < 0 && this.stoppingDistance() >= this.left() - this.platform.left()) {
+                this.a.x(this.runAccel);
+            }
+
+            else if (position - this.p.x() > 0.2) {
+                this.a.x(this.runAccel);
+            }
+
+            else if (this.p.x() - position > 0.2) {
+                this.a.x(-this.runAccel);
+            }
+
             // Stop
             else {
                 this.v.x(0);
@@ -443,9 +461,16 @@ Player.prototype.jumpTo = function(target, platforms) {
     this.route = this.findRoute(target, platforms);
 };
 
+// Navigates the player to part of the target platform given by ratio from left to right
+Player.prototype.runTo = function(ratio) {
+    this.platformPosition = ratio;
+};
+
 // Djikstra search for a shortest path
 Player.prototype.findRoute = function(target, platforms) {
-    var frontier = [{position: this.platform.id, route: [this.platform]}];
+    var jumpManoeveur = this.backOff !== false || this.runUp || this.jumping || !this.grounded;
+    var currentPlatform = jumpManoeveur ? (this.nextPlatform || this.platform) : this.platform;
+    var frontier = [{position: currentPlatform.id, route: [currentPlatform]}];
     var next = [];
     var visited = {};
     var i, j, current, jumps, route;
