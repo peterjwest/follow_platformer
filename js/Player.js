@@ -160,12 +160,16 @@ Player.prototype.update = function() {
                 this.a.x(this.runAccel);
             }
 
-            else if (position - this.p.x() > 0.2) {
+            else if (position - this.p.x() > 5) {
                 this.a.x(this.runAccel);
             }
 
-            else if (this.p.x() - position > 0.2) {
+            else if (this.p.x() - position > 5) {
                 this.a.x(-this.runAccel);
+            }
+
+            else if (Math.abs(this.v.x()) > 2) {
+                this.a.x(0);
             }
 
             // Stop
