@@ -81,7 +81,7 @@ var mouse = new Vector();
 $body.mousemove(debounce(function(e) {
   mouse.mouse(e);
   player.jumpTo(nearestPlatform(mouse.add(new Vector(0, player.size.y() / 2)), platforms), platforms);
-}, 20));
+}, 30));
 
 var loop = function() {
   player.update();
