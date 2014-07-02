@@ -46,16 +46,16 @@ Player.prototype.update = function() {
         this.running = this.direction(this.nextPlatform);
 
         // Settings for a shorter jump, when jumping down or nearby
-        var shortJump = 0.3;
+        var shortJump = 0.4;
 
         // Test whether the shorter jump is high enough to succeed
-        var shortJumpHeight = this.jumpHeight(shortJump) >= this.platform.ground() - this.nextPlatform.ground();
+        var shortJumpHeight = this.checkJumpHeight(this.nextPlatform, shortJump);
 
         // Work out the required velocity for a shorter jump
         var v = this.requiredVelocity(this.nextPlatform, this.jumpFrames(this.nextPlatform, shortJump));
 
         // Test if we are ready to jump
-        if (shortJumpHeight && (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v))) {
+        if (shortJumpHeight && (v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v)) && this.stoppingDistance() <= this.nextPlatform.size.x() - PADDING * 2 - this.size.x()) {
 
             // Decelerate if the velocity is too inaccurate
             if (Math.abs(this.v.x() - v) > 1) {
@@ -86,7 +86,7 @@ Player.prototype.update = function() {
                 this.jumping = 1;
             }
 
-            // Otherwise test if we are ready to jump
+            // Otherwise test if we are ready to jump and can land the jump
             else if ((v === 0 || (v > 0 ? this.v.x() >= v : this.v.x() <= v)) && this.stoppingDistance() <= this.nextPlatform.size.x() - PADDING * 2 - this.size.x()) {
 
                 // Decelerate if the velocity is too inaccurate
@@ -293,7 +293,7 @@ Player.prototype.slowingDistance = function(speed) {
 
     this.running = -direction;
     this.route = [];
-    this.nextPlatform = null;
+    this.nextPlatform = true;
     this.runUp = false;
     this.backOff = false;
 
@@ -329,7 +329,18 @@ Player.prototype.over = function(platform) {
 // Checks if the player could potentially jump to another platform
 Player.prototype.couldJump = function(target) {
     if (!this.checkJumpHeight(target)) return false;
-    return this.maxSpeed() >= this.requiredSpeed(target);
+    return this.maxSpeed() >= this.requiredSpeed(target) && this.couldStop(target);
+};
+
+// Checks if the player could potentially stop in time after jumping to another platform
+Player.prototype.couldStop = function(target) {
+    this.pushState();
+    var v = this.requiredSpeed(target);
+    this.v.x(v);
+
+    var couldStop = this.stoppingDistance() <= target.size.x() - PADDING * 2 - this.size.x();
+    this.popState();
+    return couldStop;
 };
 
 // Computes the number of steps needed for a back off jump
@@ -366,8 +377,8 @@ Player.prototype.computeBackOffJump = function(target) {
     return steps;
 };
 
-Player.prototype.checkJumpHeight = function(target) {
- return this.jumpHeight() >= this.platform.ground() - target.ground();
+Player.prototype.checkJumpHeight = function(target, scale) {
+ return this.jumpHeight(scale) >= this.platform.ground() - target.ground();
 };
 
 // Finds the max speed the player can travel on a platform
@@ -406,10 +417,8 @@ Player.prototype.canJump = function(target) {
 
     while (this.over(this.platform)) {
         if (Math.abs(this.v.x()) >= Math.abs(this.requiredVelocity(target, jumpFrames))) {
-            //if (this.stoppingDistance() < target.size.x() - PADDING * 2 - this.size.x()) {
-                this.popState();
-                return true;
-            //}
+            this.popState();
+            return true;
         }
         this.update();
     }
