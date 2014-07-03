@@ -34,7 +34,7 @@ $window.resize(function() {
 });
 
 player.findPaths(platforms);
-player.platform = platforms[0];
+player.moveTo(platforms[0]);
 player.target = platforms[0];
 
 var nearestPlatform = function(vector, platforms) {

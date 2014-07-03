@@ -1,6 +1,7 @@
 var Player = function($elem) {
     this.$elem = $elem;
 
+    this.$elem.css('position', 'absolute');
     this.size = Vector.size(this.$elem);
     this.p = Vector.offset(this.$elem);
     this.v = new Vector();

@@ -3,6 +3,8 @@
   background: #98C298;
   border-bottom: 1px solid #80A780;
   border-left: 1px solid #80A780;
+  color: white;
+  padding: 2px 3px;
 }
 
 .platform-inset {
@@ -14,10 +16,7 @@
 }
 
 .player {
-  position: absolute;
-  top: 0; left: 0;
   width: 25px;
   height: 50px;
   background: #1356a9;
 }
-
