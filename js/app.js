@@ -1,26 +1,31 @@
 var $window = $(window);
 var $body = $('body');
 var $player = $('[data-player]');
-var $platforms = $('[data-platform]');
 
 var method = function(name) {
     var args = Array.prototype.slice.call(arguments, 1);
     return function(item) { return item[name].apply(item, args); };
 };
 
-$body.data('platform', 'bottom');
 $body.css('min-height', window.innerHeight);
 
 var arena = new Platform($body);
 var player = new Player($player);
 
 var i = 0;
-var platforms = $platforms.map(function() {
-  var platform = new Platform($(this));
+var platforms = $('[data-platform-top]').map(function() {
+  var platform = new Platform($(this), 'top');
   platform.id = i++;
 
   return platform;
 }).toArray();
+
+platforms = platforms.concat($('[data-platform-bottom]').map(function() {
+  var platform = new Platform($(this), 'bottom');
+  platform.id = i++;
+
+  return platform;
+}).toArray());
 
 $window.resize(function() {
   $body.css('min-height', window.innerHeight);

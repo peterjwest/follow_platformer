@@ -1,10 +1,9 @@
-var Platform = function($elem, arena) {
+var Platform = function($elem, type) {
     this.$elem = $elem;
-    this.arena = arena;
     this.p = new Vector();
     this.size = new Vector();
     this.mu = 0.96;
-    this.type = this.$elem.data('platform');
+    this.type = type;
     this.update();
 };
 
