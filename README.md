@@ -6,6 +6,7 @@ This is a small demo to show how a platformer character could be controlled by a
 
 ## TODO
 
+- improve short jump handling
 - handle falling short of platform nicely
 - update algorithm to take platform distance into account
 - add maximum fall distance
