@@ -81,7 +81,7 @@ Player.prototype.update = function() {
             }
 
             // If we've hit the edge of the platform, jump!
-            if (!this.over(this.platform)) {
+            if (this.running > 0 ? this.right() > this.platform.right() : this.left() < this.platform.left()) {
                 this.v.x(v);
                 this.a.x(0);
                 this.jumping = 1;
@@ -368,6 +368,7 @@ Player.prototype.couldStop = function(target) {
 // Computes the number of steps needed for a back off jump
 Player.prototype.computeBackOffJump = function(target) {
     var i, steps = 0;
+    var direction = -this.direction(target);
 
     while (true) {
         this.pushState();
@@ -376,14 +377,14 @@ Player.prototype.computeBackOffJump = function(target) {
         this.runUp = false;
         this.backOff = false;
 
-        this.running = -this.direction(target);
+        this.running = direction;
         for (i = 0; i < steps; i++) this.update();
 
-        this.running *= -1;
+        this.running = -direction;
         while (this.v.x() * -this.running > 0) this.update();
 
-        if (this.right() > this.platform.right() || this.left() < this.platform.left()) {
-            steps--;
+        if (direction > 0 ? this.right() > this.platform.right() : this.left() < this.platform.left()) {
+            if (steps > 0) steps--;
             break;
         }
 
