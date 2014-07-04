@@ -30,7 +30,6 @@ I'm planning to add more configuration options in the future.
 
 ## TODO
 
-- Add interactive elements based on proximity
 - Add player configuration options (run speed, jump height, gravity)
 - Add player animation hooks to allow run, jump, idle animations
 - Improve short jump handling
@@ -38,4 +37,3 @@ I'm planning to add more configuration options in the future.
 - Update algorithm to take platform distance into account (fastest route)
 - Add maximum fall distance
 - Add ability to jump to correct position on platform
-- GH pages demo
