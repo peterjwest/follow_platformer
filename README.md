@@ -5,7 +5,7 @@ This is a small demo to show how a platformer character could be controlled by a
 
 [Demo](http://peterjwest.github.io/follow_platformer/)
 
-[Download minified](dist/follower.min.js)
+[Download minified](https://raw.githubusercontent.com/peterjwest/follow_platformer/master/dist/follower.min.js)
 
 ## How to use
 
