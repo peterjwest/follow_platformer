@@ -17,9 +17,9 @@ This is a small demo to show how a platformer character could be controlled by a
 
 5. Tag trigger elements to toggle create effects when the player is near
 
-    a. Use the `data-trigger` attribute with the value `add-class`, `remove-class`, `toggle-class` or `reverse-toggle-class`
-    b. Use the `data-proximity` attribute to specify a distance at which to trigger the event
-    c. Use the `data-class` attribute to choose a class to add/remove
+    - Use the `data-trigger` attribute with the value `add-class`, `remove-class`, `toggle-class` or `reverse-toggle-class`
+    - Use the `data-proximity` attribute to specify a distance at which to trigger the event
+    - Use the `data-class` attribute to choose a class to add/remove
 
 6. That's it! If your platforms are too far apart, the player may not be able to jump between them though.
 
