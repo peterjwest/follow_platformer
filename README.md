@@ -6,17 +6,19 @@ This is a small demo to show how a platformer character could be controlled by a
 ## How to use
 
 1. Include the minified script on your page (recommended at the bottom of the body tag)
+
 2. Include jQuery on the page before the script
-3. Tag the player character using the `data-player` attribtute e.g:
 
-    <div class="player" data-player></div>
+3. Tag the player character using the `data-player` attribtute
 
-4. Tag platforms for the player to run on using `data-platform-top` and `data-platform-bottom`, these will allow the player to jump on the top or bottom of that element respectively:
+4. Tag platforms for the player to run on using `data-platform="top"`, `data-platform="bottom"` or `data-platform="both"`, these will allow the player to jump on the top, bottom or both ledges of that element respectively
 
-    <section class="platform" data-platform-top style="left: 830px; top: 320px; width: 100px; height: 20px;">
-    </section>
+5. Tag trigger elements to toggle create effects when the player is near
+    a. Use the `data-trigger` attribute with the value `add-class`, `remove-class`, `toggle-class` or `reverse-toggle-class`
+    b. Use the `data-proximity` attribute to specify a distance at which to trigger the event
+    c. Use the `data-class` attribute to choose a class to add/remove
 
-5. That's it! If your platforms are too far apart, the player may not be able to jump between them though.
+6. That's it! If your platforms are too far apart, the player may not be able to jump between them though.
 
 I'm planning to add more configuration options in the future.
 

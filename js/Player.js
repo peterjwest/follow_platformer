@@ -513,8 +513,12 @@ Player.prototype.right = function() {
     return this.p.x() + this.size.x();
 };
 
-Player.prototype.feet = function() {
-    return this.p.y() + this.size.y();
+Player.prototype.top = function() {
+    return this.p.y() - this.size.y();
+};
+
+Player.prototype.bottom = function() {
+    return this.p.y();
 };
 
 Player.prototype.draw = function() {

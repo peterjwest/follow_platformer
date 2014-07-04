@@ -5,33 +5,41 @@
 
   <body>
     <div class="container">
-      <section class="platform" data-platform-top style="left: 50px; top: 100px; width: 200px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 50px; top: 100px; width: 200px; height: 20px;">
         0
       </section>
-      <section class="platform" data-platform-top style="left: 400px; top: 150px; width: 200px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 400px; top: 150px; width: 200px; height: 20px;">
         1
       </section>
-      <section class="platform" data-platform-top style="left: 80px; top: 220px; width: 100px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 80px; top: 220px; width: 100px; height: 20px;">
         2
       </section>
-      <section class="platform" data-platform-top style="left: 450px; top: 300px; width: 150px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 450px; top: 300px; width: 150px; height: 20px;">
         3
       </section>
-      <section class="platform platform-outset" data-platform-bottom style="left: 190px; top: 260px; width: 100px; height: 80px;">
+      <section class="platform platform-outset" data-platform="bottom" style="left: 190px; top: 260px; width: 100px; height: 80px;">
         4
       </section>
-      <section class="platform" data-platform-top style="left: 540px; top: 410px; width: 70px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 540px; top: 410px; width: 70px; height: 20px;">
         5
       </section>
-      <section class="platform" data-platform-top style="left: 150px; top: 450px; width: 270px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 150px; top: 450px; width: 270px; height: 20px;">
         6
       </section>
-      <section class="platform" data-platform-top style="left: 830px; top: 320px; width: 100px; height: 20px;">
+      <section class="platform" data-platform="top" style="left: 830px; top: 320px; width: 100px; height: 20px;">
         7
       </section>
-      <section class="platform platform-inset" data-platform-top data-platform-bottom style="left: 750px; top: 200px; width: 80px; height: 100px;">
+      <section class="platform platform-inset" data-platform="both" style="left: 750px; top: 200px; width: 80px; height: 100px;">
         8
       </section>
+
+      <section class="trigger out" data-trigger="remove-class" data-class="out" data-proximity="50" style="left: 75px; top: 375px; width: 30px; height: 50px;">
+      </section>
+      <section class="trigger out" data-trigger="toggle-class" data-class="in" data-proximity="200" style="left: 500px; top: 220px; width: 50px; height: 50px;">
+      </section>
+      <section class="trigger out in" data-trigger="reverse-toggle-class" data-class="in" data-proximity="0" style="left: 550px; top: 50px; width: 100px; height: 60px;">
+      </section>
+
       <div class="player" data-player></div>
     </div>
   </body>
