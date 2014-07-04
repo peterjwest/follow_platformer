@@ -7,7 +7,7 @@ This is a small demo to show how a platformer character could be controlled by a
 
 ## How to use
 
-1. Include the minified script on your page (recommended at the bottom of the body tag)
+1. Include the minified script on your page (recommended at the bottom of the body tag), [download link](dist/platformer.min.js)
 
 2. Include jQuery on the page before the script
 
