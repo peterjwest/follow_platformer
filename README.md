@@ -3,9 +3,9 @@ Mouse following platformer
 
 This is a small demo to show how a platformer character could be controlled by a mouse, in a way that would be intuitive and fun for non gamers. The character would also naturally follow as the user browsed the page.
 
-[Demo](http://peterjwest.github.io/follow_platformer/)
+## [Demo](http://peterjwest.github.io/follow_platformer/)
 
-[Download minified](https://raw.githubusercontent.com/peterjwest/follow_platformer/master/dist/follower.min.js)
+## [Download minified](https://raw.githubusercontent.com/peterjwest/follow_platformer/master/dist/follower.min.js)
 
 ## How to use
 
