@@ -16,6 +16,7 @@ This is a small demo to show how a platformer character could be controlled by a
 4. Tag platforms for the player to run on using `data-platform="top"`, `data-platform="bottom"` or `data-platform="both"`, these will allow the player to jump on the top, bottom or both ledges of that element respectively
 
 5. Tag trigger elements to toggle create effects when the player is near
+
     a. Use the `data-trigger` attribute with the value `add-class`, `remove-class`, `toggle-class` or `reverse-toggle-class`
     b. Use the `data-proximity` attribute to specify a distance at which to trigger the event
     c. Use the `data-class` attribute to choose a class to add/remove
