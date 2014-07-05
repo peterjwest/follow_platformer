@@ -99,7 +99,7 @@ require(['Vector', 'Player', 'Platform', 'vendor/raf'], function(Vector, Player,
         for (var i = 0; i < triggers.length; i++) {
             $elem = triggers[i].$elem;
             dist = triggers[i].distanceFromPlayer(player);
-            if (dist <= $elem.data('proximity')) {
+            if (dist <= ($elem.data('proximity') || 0)) {
                 if ($elem.data('trigger') === 'add-class' || $elem.data('trigger') === 'toggle-class') {
                     $elem.addClass($elem.data('class'));
                 }
